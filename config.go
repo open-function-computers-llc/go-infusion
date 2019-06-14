@@ -10,6 +10,9 @@ type Config struct {
 	Logger       *logrus.Logger
 	AuthToken    string
 	RefreshToken string
+	ClientID     string
+	ClientSecret string
+	TagMapper    map[string]int
 }
 
 func (c Config) validate() error {

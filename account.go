@@ -2,6 +2,7 @@ package infusion
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 )
 
@@ -44,6 +45,10 @@ func GetAccountProfile() (AccountProfile, error) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return ap, err
+	}
+
+	if r.StatusCode == 401 {
+		return ap, errors.New("Invalid status code from Infusion")
 	}
 
 	err = json.Unmarshal(body, &ap)

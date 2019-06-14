@@ -171,10 +171,11 @@ func CreateContact(firstName, lastName, email string) (Contact, error) {
 		return response, errors.New("Error from Infusion: " + string(rBody))
 	}
 
-	log.Info("Contact createion complete. Result: " + string(rBody))
+	log.Info("Contact creation complete. Result: " + string(rBody))
 	return response, nil
 }
 
+// TagContact tag a contact in Infusion by contact and tag ID
 func TagContact(contactID, tagID int) error {
 	type taggerResponse []struct {
 		Key string `json:"key"`
@@ -198,6 +199,24 @@ func TagContact(contactID, tagID int) error {
 		return errors.New("Error from Infusion: " + string(rBody) + " CODE" + r.Status)
 	}
 
-	log.Info("Contact createion complete. Result: " + string(rBody))
+	log.Info("Contact was tagged successfully. Result: " + string(rBody))
+	return nil
+}
+
+// UnTagContact untag a contact in Infusion by contact and tag ID
+func UnTagContact(contactID, tagID int) error {
+	type taggerResponse []struct {
+		Key string `json:"key"`
+	}
+
+	r, err := deleteRequest("/contacts/" + strconv.Itoa(contactID) + "/tags/" + strconv.Itoa(tagID))
+	if err != nil {
+		return err
+	}
+
+	if r.StatusCode != 204 {
+		return errors.New("Got a different status code than 204. Status: " + r.Status)
+	}
+	log.Info("Contact untagged successfully.")
 	return nil
 }
