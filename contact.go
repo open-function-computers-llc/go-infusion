@@ -82,6 +82,22 @@ type Contact struct {
 	Website    string `json:"website"`
 }
 
+type createContactBodyEmail struct {
+	Email string `json:"email"`
+	Field string `json:"field"`
+}
+
+type createContactBody struct {
+	EmailAddresses []createContactBodyEmail `json:"email_addresses"`
+	FamilyName     string                   `json:"family_name"`
+	GivenName      string                   `json:"given_name"`
+}
+
+type upsertContactBody struct {
+	EmailAddresses []createContactBodyEmail `json:"email_addresses"`
+	Duplicate      string                   `json:"duplicate_option"`
+}
+
 // LookupContact reach out to Infusion and query contacts based on name and email
 func LookupContact(firstName, lastName, email string) (ContactsQueryResponse, error) {
 	response := ContactsQueryResponse{}
@@ -105,7 +121,7 @@ func LookupContact(firstName, lastName, email string) (ContactsQueryResponse, er
 	return response, nil
 }
 
-// LookupContact reach out to Infusion and query contacts based on email address only
+// LookupContactByEmail reach out to Infusion and query contacts based on email address only
 func LookupContactByEmail(email string) (ContactsQueryResponse, error) {
 	response := ContactsQueryResponse{}
 
@@ -132,15 +148,6 @@ func LookupContactByEmail(email string) (ContactsQueryResponse, error) {
 func CreateContact(firstName, lastName, email string) (Contact, error) {
 	response := Contact{}
 
-	type createContactBodyEmail struct {
-		Email string `json:"email"`
-		Field string `json:"field"`
-	}
-	type createContactBody struct {
-		EmailAddresses []createContactBodyEmail `json:"email_addresses"`
-		FamilyName     string                   `json:"family_name"`
-		GivenName      string                   `json:"given_name"`
-	}
 	emailObject := createContactBodyEmail{
 		Email: email,
 		Field: "EMAIL1",
@@ -172,6 +179,39 @@ func CreateContact(firstName, lastName, email string) (Contact, error) {
 	}
 
 	log.Info("Contact creation complete. Result: " + string(rBody))
+	return response, nil
+}
+
+// UpsertContact - Looks for contact with email. If found, updates email, if not found, creates contact with email address
+func UpsertContact(email string) (Contact, error) {
+	response := Contact{}
+
+	emailObject := createContactBodyEmail{
+		Email: email,
+		Field: "EMAIL1",
+	}
+	emails := make([]createContactBodyEmail, 1)
+	emails[0] = emailObject
+	body := upsertContactBody{
+		Duplicate:      "Email",
+		EmailAddresses: emails,
+	}
+	data, _ := json.Marshal(body)
+
+	r, err := postRequest("/contacts", data)
+	if err != nil {
+		return response, err
+	}
+
+	rBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return response, err
+	}
+	err = json.Unmarshal(rBody, &response)
+	if err != nil {
+		return response, err
+	}
+
 	return response, nil
 }
 
