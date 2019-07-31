@@ -198,12 +198,13 @@ func UpsertContact(email string) (Contact, error) {
 	}
 	data, _ := json.Marshal(body)
 
-	r, err := postRequest("/contacts", data)
+	r, err := putRequest("/contacts", data)
 	if err != nil {
 		return response, err
 	}
 
 	rBody, err := ioutil.ReadAll(r.Body)
+	log.Info(string(rBody))
 	if err != nil {
 		return response, err
 	}
@@ -233,6 +234,7 @@ func TagContact(contactID, tagID int) error {
 	}
 	err = json.Unmarshal(rBody, &response)
 	if err != nil {
+		log.Error("Raw response: " + string(rBody))
 		return err
 	}
 	if r.StatusCode != 201 {

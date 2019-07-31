@@ -45,6 +45,22 @@ func postRequest(route string, body []byte) (*http.Response, error) {
 	return client.Do(req)
 }
 
+func putRequest(route string, body []byte) (*http.Response, error) {
+	url := infusionBaseURL + route
+	log.Info("PUT: "+url, "PUTBODY: "+string(body))
+
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(body))
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+authToken)
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	return client.Do(req)
+}
+
 func postFormRequest(route string, body url.Values) (*http.Response, error) {
 	log.Info("POST: "+route, "POSTBODY: "+body.Encode())
 
