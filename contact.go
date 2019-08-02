@@ -235,6 +235,17 @@ func TagContact(contactID, tagID int) error {
 	err = json.Unmarshal(rBody, &response)
 	if err != nil {
 		log.Error("Raw response: " + string(rBody))
+
+		// the response might look like a simple map[string]string from more recent testing. let's check that scenario here
+		var rawStringMap map[string]string
+		json.Unmarshal(rBody, &rawStringMap)
+		if val, ok := rawStringMap[strconv.Itoa(tagID)]; ok {
+			if val == "SUCCESS" {
+				log.Info("Contact was tagged successfully. Result: " + string(rBody))
+				return nil
+			}
+		}
+
 		return err
 	}
 	if r.StatusCode != 201 {
