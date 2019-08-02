@@ -234,8 +234,6 @@ func TagContact(contactID, tagID int) error {
 	}
 	err = json.Unmarshal(rBody, &response)
 	if err != nil {
-		log.Error("Raw response: " + string(rBody))
-
 		// the response might look like a simple map[string]string from more recent testing. let's check that scenario here
 		var rawStringMap map[string]string
 		json.Unmarshal(rBody, &rawStringMap)
@@ -244,7 +242,13 @@ func TagContact(contactID, tagID int) error {
 				log.Info("Contact was tagged successfully. Result: " + string(rBody))
 				return nil
 			}
+			if val == "DUPLICATE" {
+				log.Warn("Contact already has this tag. Result: " + string(rBody))
+				return nil
+			}
 		}
+
+		log.Warn("Raw response: " + string(rBody))
 
 		return err
 	}
