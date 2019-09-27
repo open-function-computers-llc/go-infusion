@@ -1,6 +1,6 @@
 package infusion
 
-import "github.com/Sirupsen/logrus"
+import "github.com/sirupsen/logrus"
 
 var log *logrus.Logger
 var tagMapper map[string]int

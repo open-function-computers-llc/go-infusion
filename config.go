@@ -1,7 +1,7 @@
 package infusion
 
 import (
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // Config This is where we will add anything we need to make this library work
