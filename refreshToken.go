@@ -6,6 +6,7 @@ import (
 	"net/url"
 )
 
+// GetRefreshToken get an updated token from infusion
 func GetRefreshToken() error {
 	data := url.Values{}
 	data.Add("grant_type", "refresh_token")
